@@ -87,6 +87,8 @@ $navLink = function (string $key, string $href, string $label) use ($nav): strin
   </div>
 </footer>
 
+<?php upsi((
+
 </body>
 </html>
 
