@@ -617,6 +617,8 @@ ssh -i "C:\Users\User\.ssh\Mishuna-keypair.pem" ec2-user@<Public-IP> ./deploy.sh
 
 А также ссылка на ADR-файл который описывает архитектурное решение:
 
+[ADR-0001 — Способ деплоя приложения](docs/adr/0001-deploy-method.md)
+
 ---
 
 ## Контрольные вопросы
