@@ -348,7 +348,7 @@ S3 возвращает разные ответы, поскольку роль �
 
 ![schema](./images/ex14_schema.png)
 
-[ADR-0003](../lab02/timecapsule/docs/adr/0003-attachment-storage.md.md)
+[ADR-0003](../lab02/timecapsule/docs/adr/0003-attachment-storage.md)
 
 ---
 
