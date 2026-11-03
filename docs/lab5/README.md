@@ -586,7 +586,6 @@ Instance timecapsule-dev-rds is not in available state.
 
 ![Архитектура TimeCapsule после перехода на RDS](./images/ex12_architecture.png)
 
-[Редактируемая схема SVG](./images/ex12_architecture.svg).
 
 В схеме показаны VPC `10.5.0.0/16`, четыре подсети, app-server, bastion, группы доступа, приватная CNAME-запись Route 53 и Scheduler с отдельной IAM-ролью. `private-b` входит в группу подсетей базы, но постоянного резервного экземпляра там нет. Учебные базы Части 1 отмечены как удалённые.
 
