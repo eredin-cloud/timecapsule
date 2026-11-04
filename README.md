@@ -2,9 +2,10 @@
 
 This is the TimeCapsule app written in plain PHP (8.2+) without a framework, in a procedural
 ("functional") style: the code is plain functions in a few files, with no classes of our own.
-It uses PDO for PostgreSQL and plain PHP templates. The only PHP library is
-[vlucas/phpdotenv](https://github.com/vlucas/phpdotenv), which reads the `.env` file; it is
-installed with [Composer](https://getcomposer.org). In the browser, the date and time picker is
+It uses PDO for PostgreSQL and plain PHP templates. PHP dependencies include
+[vlucas/phpdotenv](https://github.com/vlucas/phpdotenv) for the `.env` file and the AWS SDK
+for S3 attachments and DynamoDB sessions. They are installed with [Composer](https://getcomposer.org).
+In the browser, the date and time picker is
 [flatpickr](https://flatpickr.js.org) (MIT license), vendored in `public/vendor/flatpickr`. The [root README](../README.md) explains
 what the app does. [`../open_capsules_php_oop`](../open_capsules_php_oop) is the same app written with classes.
 
@@ -25,7 +26,7 @@ src/controllers/                 one file per page group
 views/                           HTML templates (layout.php + one file per page)
 bin/init-db.php                  creates the tables from database/schema.sql
 storage/uploads/                 uploaded files
-storage/sessions/                PHP session files
+storage/sessions/                legacy directory; sessions now live in DynamoDB
 deploy/nginx.conf                sample nginx site for an Ubuntu server
 composer.json / composer.lock    Composer packages (vendor/ is not in git)
 ```
@@ -135,6 +136,7 @@ set in `docker-compose.yml`. The code reads every setting with `config()` in
 | `DB_NAME` | `timecapsule` | |
 | `DB_USER` | `timecapsule` | |
 | `DB_PASSWORD` | `secret` | |
+| `DYNAMODB_SESSION_TABLE` | Required | Shared session table; partition key `id` (String), TTL attribute `expires`. Example: `timecapsule-dev-sessions`. |
 | `UPLOAD_DIR` | `storage/uploads` | Upload folder. A relative path starts at the project root. |
 | `MAX_UPLOAD_MB` | `5` | Maximum attachment size, in MB |
 | `MAIL_DELAY_SECONDS` | `3` | How long the simulated "send e-mail" step takes |
