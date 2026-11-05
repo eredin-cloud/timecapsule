@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1480" viewBox="0 0 1920 1480" role="img" aria-labelledby="title desc">
+<title id="title">TimeCapsule: ALB, Auto Scaling и общие сессии DynamoDB</title><desc id="desc">Рабочая архитектура ЛР6: публичный ALB и серверы Auto Scaling в двух зонах, HTTP только от ALB, SSH через bastion, приватная RDS Single-AZ в зоне a, сессии DynamoDB, вложения S3, CloudWatch, Route 53 и расписание остановки RDS. Схема показывает конфигурацию до завершения занятия.</desc><defs>
+<marker id="a-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#263445" stroke-width="1.5"/></marker>
+<marker id="a-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#657386" stroke-width="1.5"/></marker>
+<marker id="a-flow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#536477" stroke-width="1.5"/></marker>
+<marker id="a-vpc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#9969cc" stroke-width="1.5"/></marker>
+<marker id="a-pub" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#8caa3c" stroke-width="1.5"/></marker>
+<marker id="a-priv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#35a7a3" stroke-width="1.5"/></marker>
+<marker id="a-sg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#d6597c" stroke-width="1.5"/></marker>
+<marker id="a-db" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#159a98" stroke-width="1.5"/></marker>
+<marker id="a-admin" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#778596" stroke-width="1.5"/></marker>
+<marker id="a-dns" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#9469ce" stroke-width="1.5"/></marker>
+<marker id="a-s3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#418f4a" stroke-width="1.5"/></marker>
+<marker id="a-dynamo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#a531b9" stroke-width="1.5"/></marker>
+<marker id="a-control" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#da5289" stroke-width="1.5"/></marker>
+<marker id="a-cloud" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#bd782d" stroke-width="1.5"/></marker>
+</defs><g font-family="Segoe UI, Arial, sans-serif">
+<rect x="0" y="0" width="1920" height="1480" rx="12" fill="#f6f8fc" stroke="none" stroke-width="2" />
+<text x="42" y="49" font-size="31" fill="#172332" font-weight="700" text-anchor="start">TimeCapsule · Лабораторная работа №6</text>
+<text x="43" y="81" font-size="18" fill="#657386" font-weight="400" text-anchor="start">Рабочая конфигурация заданий 5–6: ALB + Auto Scaling, общие RDS, S3 и DynamoDB</text>
+<rect x="210" y="110" width="1670" height="1270" rx="12" fill="#ffffff" stroke="#344254" stroke-width="2" />
+<text x="232" y="141" font-size="20" fill="#263445" font-weight="700" text-anchor="start">AWS Cloud</text>
+<rect x="235" y="162" width="1620" height="1190" rx="12" fill="#ffffff" stroke="#35a7a3" stroke-width="2" stroke-dasharray="9 7"/>
+<text x="256" y="192" font-size="18" fill="#278a86" font-weight="600" text-anchor="start">Europe (Frankfurt) · eu-central-1</text>
+<rect x="270" y="245" width="1100" height="1050" rx="12" fill="#fdfcff" stroke="#9969cc" stroke-width="2" />
+<text x="293" y="278" font-size="20" fill="#8256b4" font-weight="600" text-anchor="start">VPC timecapsule-dev-vpc · 10.5.0.0/16</text>
+<rect x="305" y="305" width="500" height="620" rx="12" fill="#f4f8ed" stroke="#8caa3c" stroke-width="2" />
+<rect x="835" y="305" width="500" height="620" rx="12" fill="#f4f8ed" stroke="#8caa3c" stroke-width="2" />
+<text x="326" y="335" font-size="18" fill="#65812d" font-weight="600" text-anchor="start">public-a · 10.5.0.0/24 · eu-central-1a</text>
+<text x="856" y="335" font-size="18" fill="#65812d" font-weight="600" text-anchor="start">public-b · 10.5.1.0/24 · eu-central-1b</text>
+<rect x="330" y="360" width="975" height="125" rx="12" fill="#f8f4fc" stroke="#9969cc" stroke-width="2" />
+<rect x="325" y="530" width="990" height="290" rx="12" fill="#fffcf7" stroke="#d99b4a" stroke-width="2" stroke-dasharray="7 5"/>
+<rect x="350" y="620" width="420" height="175" rx="12" fill="#ffffff" stroke="#d6597c" stroke-width="2" />
+<rect x="865" y="620" width="420" height="175" rx="12" fill="#ffffff" stroke="#d6597c" stroke-width="2" />
+<rect x="350" y="850" width="420" height="56" rx="12" fill="#f5f6f8" stroke="#b6bfcb" stroke-width="2" />
+<rect x="865" y="850" width="420" height="56" rx="12" fill="#ffffff" stroke="#d6597c" stroke-width="2" />
+<rect x="290" y="980" width="1060" height="290" rx="12" fill="#fcfdff" stroke="#638db5" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="305" y="1025" width="500" height="225" rx="12" fill="#edf9f8" stroke="#35a7a3" stroke-width="2" />
+<rect x="835" y="1025" width="500" height="225" rx="12" fill="#edf9f8" stroke="#35a7a3" stroke-width="2" />
+<rect x="325" y="1080" width="460" height="145" rx="12" fill="#ffffff" stroke="#d6597c" stroke-width="2" />
+<rect x="1420" y="245" width="390" height="135" rx="12" fill="#fff8ee" stroke="#d39c55" stroke-width="2" />
+<rect x="1420" y="410" width="390" height="110" rx="12" fill="#faf6ff" stroke="#c4ade4" stroke-width="2" />
+<rect x="1420" y="550" width="390" height="155" rx="12" fill="#f3f8ed" stroke="#98ba75" stroke-width="2" />
+<rect x="1420" y="735" width="390" height="175" rx="12" fill="#fcf4fd" stroke="#c58bd0" stroke-width="2" />
+<rect x="1420" y="940" width="390" height="110" rx="12" fill="#f5f8fc" stroke="#abc0d6" stroke-width="2" />
+<rect x="1420" y="1080" width="390" height="170" rx="12" fill="#fdf5f9" stroke="#df96b6" stroke-width="2" />
+<path d="M155 420H243" fill="none" stroke="#536477" stroke-width="2.5"  marker-end="url(#a-flow)"/>
+<path d="M297 420H330" fill="none" stroke="#536477" stroke-width="2.5"  marker-end="url(#a-flow)"/>
+<path d="M90 375V215H1835V625H1810" fill="none" stroke="#418f4a" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#a-s3)"/>
+<path d="M560 485V520H338V685H350" fill="none" stroke="#536477" stroke-width="2.5"  marker-end="url(#a-flow)"/>
+<path d="M1075 485V520H1323V685H1285" fill="none" stroke="#536477" stroke-width="2.5"  marker-end="url(#a-flow)"/>
+<path d="M1305 420H1365V310H1420" fill="none" stroke="#bd782d" stroke-width="2.5"  marker-end="url(#a-cloud)"/>
+<path d="M1420 285H1355V550H1315" fill="none" stroke="#bd782d" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#a-cloud)"/>
+<path d="M1285 650H1385V465H1420" fill="none" stroke="#9469ce" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#a-dns)"/>
+<path d="M1285 700H1400V625H1420" fill="none" stroke="#418f4a" stroke-width="2.5"  marker-end="url(#a-s3)"/>
+<path d="M1400 700V820H1420" fill="none" stroke="#a531b9" stroke-width="2.5"  marker-end="url(#a-dynamo)"/>
+<path d="M350 730H315V955H540V1080" fill="none" stroke="#159a98" stroke-width="2.5"  marker-end="url(#a-db)"/>
+<path d="M865 730H815V955H540" fill="none" stroke="#159a98" stroke-width="2.5"  marker-end="url(#a-db)"/>
+<path d="M145 920H285V935H1075V906" fill="none" stroke="#778596" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#a-admin)"/>
+<path d="M1075 850V820" fill="none" stroke="#778596" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#a-admin)"/>
+<path d="M1420 1165H1390V1310H550V1225" fill="none" stroke="#da5289" stroke-width="2.5"  marker-end="url(#a-control)"/>
+<g fill="none" stroke="#536477" stroke-width="2.5"><circle cx="90" cy="393" r="14"/><path d="M62 446v-16c0-28 56-28 56 0v16M40 446c0-20 8-29 21-29m58 0c13 0 21 9 21 29"/><rect x="53" y="844" width="76" height="48" rx="4"/><path d="M44 902h94l-10 10H54Z"/></g>
+<text x="90" y="479" font-size="18" fill="#263445" font-weight="600" text-anchor="middle">Пользователи</text>
+<text x="90" y="505" font-size="15" fill="#657386" font-weight="400" text-anchor="middle">браузер</text>
+<text x="95" y="951" font-size="17" fill="#263445" font-weight="600" text-anchor="middle">Ваш компьютер</text>
+<text x="95" y="976" font-size="14" fill="#657386" font-weight="400" text-anchor="middle">SSH через bastion</text>
+<circle cx="270" cy="420" r="27" fill="white" stroke="#9969cc" stroke-width="3"/>
+<text x="270" y="425" font-size="13" fill="#8256b4" font-weight="700" text-anchor="middle">IGW</text>
+<text x="270" y="468" font-size="13" fill="#657386" font-weight="400" text-anchor="middle">Internet Gateway</text>
+<text x="162" y="404" font-size="14" fill="#536477" font-weight="400" text-anchor="start">HTTP 80</text>
+<text x="620" y="208" font-size="16" fill="#418f4a" font-weight="400" text-anchor="start">Вложения: браузер → S3 по presigned URL · HTTPS</text>
+<rect x="350" y="395" width="52" height="52" rx="12" fill="#8c4abb" stroke="#8c4abb" stroke-width="2" />
+<g transform="translate(350 395) scale(1.04)" stroke="white" stroke-width="2" fill="none">
+<circle cx="25" cy="25" r="17"/><path d="M8 25h13m0 0L32 14m-11 11l11 11M32 14h8M32 36h8"/>
+</g>
+<text x="835" y="390" font-size="23" fill="#263445" font-weight="600" text-anchor="middle">timecapsule-dev-alb</text>
+<text x="835" y="419" font-size="17" fill="#536477" font-weight="400" text-anchor="middle">Internet-facing · HTTP:80 · узлы в двух публичных подсетях</text>
+<text x="835" y="454" font-size="16" fill="#d6597c" font-weight="500" text-anchor="middle">timecapsule-dev-alb-sg: TCP/80 от 0.0.0.0/0</text>
+<text x="820" y="511" font-size="17" fill="#536477" font-weight="500" text-anchor="middle">timecapsule-dev-tg · HTTP:80 · /health → 200 · интервал 10 секунд</text>
+<text x="347" y="558" font-size="20" fill="#976026" font-weight="600" text-anchor="start">Auto Scaling · timecapsule-dev-asg · desired 2 · min 2 · max 4</text>
+<text x="347" y="584" font-size="16" fill="#536477" font-weight="400" text-anchor="start">Шаблон: timecapsule-dev-app-lt · образ: timecapsule-dev-app-image</text>
+<text x="347" y="607" font-size="15" fill="#657386" font-weight="400" text-anchor="start">Target tracking: 50 запросов/мин на цель · проверки EC2 + ELB</text>
+<text x="366" y="644" font-size="14" fill="#d6597c" font-weight="600" text-anchor="start">timecapsule-dev-web-sg</text>
+<rect x="367" y="663" width="44" height="44" rx="12" fill="#ed8c24" stroke="#ed8c24" stroke-width="2" />
+<g transform="translate(367 663) scale(0.88)" stroke="white" stroke-width="2" fill="none">
+<rect x="14" y="14" width="22" height="22"/><path d="M19 8v6m12-6v6m-12 22v6m12-6v6m-23-23h6m-6 12h6m22-12h6m-6 12h6"/>
+</g>
+<text x="430" y="683" font-size="21" fill="#263445" font-weight="600" text-anchor="start">app · eu-central-1a</text>
+<text x="430" y="709" font-size="16" fill="#536477" font-weight="400" text-anchor="start">t3.micro · nginx + PHP-FPM</text>
+<text x="367" y="744" font-size="16" fill="#536477" font-weight="400" text-anchor="start">Общие RDS · S3 · DynamoDB</text>
+<text x="367" y="775" font-size="14" fill="#536477" font-weight="400" text-anchor="start">HTTP только от ALB; SSH от bastion</text>
+<text x="881" y="644" font-size="14" fill="#d6597c" font-weight="600" text-anchor="start">timecapsule-dev-web-sg</text>
+<rect x="882" y="663" width="44" height="44" rx="12" fill="#ed8c24" stroke="#ed8c24" stroke-width="2" />
+<g transform="translate(882 663) scale(0.88)" stroke="white" stroke-width="2" fill="none">
+<rect x="14" y="14" width="22" height="22"/><path d="M19 8v6m12-6v6m-12 22v6m12-6v6m-23-23h6m-6 12h6m22-12h6m-6 12h6"/>
+</g>
+<text x="945" y="683" font-size="21" fill="#263445" font-weight="600" text-anchor="start">app · eu-central-1b</text>
+<text x="945" y="709" font-size="16" fill="#536477" font-weight="400" text-anchor="start">t3.micro · nginx + PHP-FPM</text>
+<text x="882" y="744" font-size="16" fill="#536477" font-weight="400" text-anchor="start">Общие RDS · S3 · DynamoDB</text>
+<text x="882" y="775" font-size="14" fill="#536477" font-weight="400" text-anchor="start">HTTP только от ALB; SSH от bastion</text>
+<text x="366" y="874" font-size="16" fill="#657386" font-weight="600" text-anchor="start">Исходный app-server: остановлен</text>
+<text x="366" y="896" font-size="14" fill="#657386" font-weight="400" text-anchor="start">10.5.0.33 · Elastic IP освобождён</text>
+<rect x="878" y="861" width="32" height="32" rx="12" fill="#ed8c24" stroke="#ed8c24" stroke-width="2" />
+<g transform="translate(878 861) scale(0.64)" stroke="white" stroke-width="2" fill="none">
+<rect x="14" y="14" width="22" height="22"/><path d="M19 8v6m12-6v6m-12 22v6m12-6v6m-23-23h6m-6 12h6m22-12h6m-6 12h6"/>
+</g>
+<text x="922" y="875" font-size="17" fill="#263445" font-weight="600" text-anchor="start">timecapsule-dev-bastion</text>
+<text x="922" y="896" font-size="14" fill="#536477" font-weight="400" text-anchor="start">bastion-sg: SSH 22 только с вашего IP</text>
+<text x="1117" y="838" font-size="14" fill="#778596" font-weight="400" text-anchor="start">SSH 22 → серверы группы</text>
+<text x="945" y="971" font-size="14" fill="#778596" font-weight="400" text-anchor="start">SSH 22 · только ваш IP → bastion</text>
+<text x="570" y="951" font-size="17" fill="#159a98" font-weight="500" text-anchor="start">PostgreSQL 5432 · TLS · db.timecapsule.internal</text>
+<text x="311" y="1009" font-size="19" fill="#4d78a1" font-weight="600" text-anchor="start">DB subnet group · timecapsule-dev-db-subnets</text>
+<text x="325" y="1056" font-size="18" fill="#238d89" font-weight="600" text-anchor="start">private-a · 10.5.10.0/24 · eu-central-1a</text>
+<text x="855" y="1056" font-size="18" fill="#238d89" font-weight="600" text-anchor="start">private-b · 10.5.11.0/24 · eu-central-1b</text>
+<text x="342" y="1104" font-size="14" fill="#d6597c" font-weight="600" text-anchor="start">timecapsule-dev-rds-sg</text>
+<rect x="343" y="1120" width="44" height="44" rx="12" fill="#a32cc4" stroke="#a32cc4" stroke-width="2" />
+<g transform="translate(343 1120) scale(0.88)" stroke="white" stroke-width="2" fill="none">
+<ellipse cx="25" cy="14" rx="14" ry="6"/><path d="M11 14v23c0 8 28 8 28 0V14M11 25c0 8 28 8 28 0"/>
+</g>
+<text x="403" y="1141" font-size="21" fill="#263445" font-weight="600" text-anchor="start">timecapsule-dev-rds</text>
+<text x="403" y="1167" font-size="16" fill="#536477" font-weight="400" text-anchor="start">PostgreSQL 18.3 · Single-AZ</text>
+<text x="343" y="1194" font-size="15" fill="#536477" font-weight="400" text-anchor="start">db.t4g.micro · gp3 20 ГиБ · Public access: No</text>
+<text x="343" y="1216" font-size="14" fill="#536477" font-weight="400" text-anchor="start">TCP/5432 только от web-sg · шифрование</text>
+<text x="1085" y="1124" font-size="20" fill="#238d89" font-weight="600" text-anchor="middle">Резервного экземпляра нет</text>
+<text x="1085" y="1160" font-size="16" fill="#536477" font-weight="400" text-anchor="middle">Вторая подсеть входит в DB subnet group,</text>
+<text x="1085" y="1186" font-size="16" fill="#536477" font-weight="400" text-anchor="middle">но Multi-AZ не включён.</text>
+<text x="1085" y="1223" font-size="15" fill="#657386" font-weight="400" text-anchor="middle">RDS: ежедневные копии · хранение 7 дней</text>
+<rect x="1437" y="263" width="44" height="44" rx="12" fill="#c78735" stroke="#c78735" stroke-width="2" />
+<g transform="translate(1437 263) scale(0.88)" stroke="white" stroke-width="2" fill="none">
+<path d="M10 35h28a7 7 0 0 0 1-14 12 12 0 0 0-23-2 8 8 0 0 0-6 16Z"/><path d="M15 29l7-5 6 4 8-9"/>
+</g>
+<text x="1495" y="286" font-size="21" fill="#263445" font-weight="600" text-anchor="start">Amazon CloudWatch</text>
+<text x="1440" y="320" font-size="16" fill="#536477" font-weight="400" text-anchor="start">RequestCountPerTarget · AlarmHigh / Low</text>
+<text x="1440" y="347" font-size="16" fill="#536477" font-weight="400" text-anchor="start">Метрика ALB → политика → размер ASG</text>
+<text x="1440" y="370" font-size="14" fill="#657386" font-weight="400" text-anchor="start">Прогрев 300 с · уменьшение разрешено</text>
+<rect x="1437" y="427" width="42" height="42" rx="12" fill="#8c62bd" stroke="#8c62bd" stroke-width="2" />
+<g transform="translate(1437 427) scale(0.84)" stroke="white" stroke-width="2" fill="none">
+<circle cx="25" cy="25" r="17"/><ellipse cx="25" cy="25" rx="9" ry="17"/><path d="M8 25h34"/>
+</g>
+<text x="1492" y="450" font-size="20" fill="#263445" font-weight="600" text-anchor="start">Route 53 · private zone</text>
+<text x="1440" y="482" font-size="16" fill="#536477" font-weight="400" text-anchor="start">timecapsule.internal: db CNAME → RDS</text>
+<text x="1440" y="507" font-size="14" fill="#657386" font-weight="400" text-anchor="start">DNS доступен серверам внутри VPC</text>
+<rect x="1437" y="569" width="44" height="44" rx="12" fill="#739e37" stroke="#739e37" stroke-width="2" />
+<g transform="translate(1437 569) scale(0.88)" stroke="white" stroke-width="2" fill="none">
+<ellipse cx="25" cy="12" rx="15" ry="6"/><path d="M10 12l3 26c1 9 23 9 24 0l3-26M13 28c4 6 20 6 24 0"/>
+</g>
+<text x="1495" y="592" font-size="21" fill="#263445" font-weight="600" text-anchor="start">Amazon S3 · вложения</text>
+<text x="1440" y="625" font-size="16" fill="#536477" font-weight="400" text-anchor="start">timecapsule-dev-uploads-mishuna</text>
+<text x="1440" y="653" font-size="15" fill="#536477" font-weight="400" text-anchor="start">Приватный бакет · префикс uploads/</text>
+<text x="1440" y="680" font-size="15" fill="#536477" font-weight="400" text-anchor="start">Presigned URL: 5 минут · versioning</text>
+<text x="1440" y="726" font-size="15" fill="#536477" font-weight="400" text-anchor="start">HTTPS 443 · AWS SDK · роль приложения</text>
+<rect x="1437" y="754" width="44" height="44" rx="12" fill="#a32cc4" stroke="#a32cc4" stroke-width="2" />
+<g transform="translate(1437 754) scale(0.88)" stroke="white" stroke-width="2" fill="none">
+<ellipse cx="25" cy="14" rx="14" ry="6"/><path d="M11 14v23c0 8 28 8 28 0V14M11 25c0 8 28 8 28 0"/>
+</g>
+<text x="1495" y="778" font-size="21" fill="#263445" font-weight="600" text-anchor="start">Amazon DynamoDB</text>
+<text x="1440" y="815" font-size="19" fill="#263445" font-weight="600" text-anchor="start">timecapsule-dev-sessions</text>
+<text x="1440" y="845" font-size="16" fill="#536477" font-weight="400" text-anchor="start">On-demand · id: String · TTL: expires</text>
+<text x="1440" y="873" font-size="15" fill="#536477" font-weight="400" text-anchor="start">Общая сессия для любого app-сервера</text>
+<text x="1440" y="898" font-size="14" fill="#657386" font-weight="400" text-anchor="start">Региональная таблица · ADR-0005</text>
+<rect x="1437" y="957" width="40" height="40" rx="12" fill="#6686ac" stroke="#6686ac" stroke-width="2" />
+<g transform="translate(1437 957) scale(0.8)" stroke="white" stroke-width="2" fill="none">
+<circle cx="25" cy="16" r="8"/><path d="M10 42v-7c0-14 30-14 30 0v7Z"/>
+</g>
+<text x="1490" y="981" font-size="20" fill="#263445" font-weight="600" text-anchor="start">IAM Role серверов</text>
+<text x="1440" y="1011" font-size="17" fill="#536477" font-weight="400" text-anchor="start">timecapsule-dev-app-role</text>
+<text x="1440" y="1036" font-size="14" fill="#657386" font-weight="400" text-anchor="start">S3 + 4 действия с элементами сессий</text>
+<rect x="1437" y="1098" width="44" height="44" rx="12" fill="#d34783" stroke="#d34783" stroke-width="2" />
+<g transform="translate(1437 1098) scale(0.88)" stroke="white" stroke-width="2" fill="none">
+<rect x="10" y="12" width="30" height="30" rx="3"/><path d="M10 22h30M18 6v12m14-12v12M17 29h6m6 0h5m-17 7h6"/>
+</g>
+<text x="1495" y="1122" font-size="20" fill="#263445" font-weight="600" text-anchor="start">EventBridge Scheduler</text>
+<text x="1440" y="1155" font-size="16" fill="#536477" font-weight="400" text-anchor="start">timecapsule-dev-rds-nightly-stop</text>
+<text x="1440" y="1183" font-size="16" fill="#536477" font-weight="400" text-anchor="start">23:00 Europe/Chisinau · окно Off</text>
+<text x="1440" y="1210" font-size="14" fill="#536477" font-weight="400" text-anchor="start">Роль: timecapsule-dev-scheduler-role</text>
+<text x="1440" y="1235" font-size="14" fill="#657386" font-weight="400" text-anchor="start">Только rds:StopDBInstance этой базы</text>
+<text x="700" y="1335" font-size="16" fill="#da5289" font-weight="400" text-anchor="start">API AWS: StopDBInstance · каждый день в 23:00</text>
+<text x="42" y="1410" font-size="16" fill="#657386" font-weight="400" text-anchor="start">Сплошные линии — HTTP, SQL и API; пунктир — управление, DNS, SSH и прямая загрузка вложений.</text>
+<text x="42" y="1438" font-size="16" fill="#a05b39" font-weight="500" text-anchor="start">Ограничение: отказ eu-central-1a делает Single-AZ RDS недоступной; серверы в зоне b и DynamoDB не устраняют этот отказ.</text>
+<text x="42" y="1466" font-size="15" fill="#657386" font-weight="400" text-anchor="start">Завершение: ALB удаляется; min и desired ASG → 0, экземпляры группы завершаются; RDS и отдельные EC2 останавливаются.</text>
+</g></svg>
